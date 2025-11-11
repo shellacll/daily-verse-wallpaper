@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ayat Harian Wallpaper Otomatis</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@400&display=swap" rel="stylesheet">
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <style>
+        /* CSS untuk Desain Wallpaper */
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* Latar Belakang Pastel Lembut (Pale Lavender/Dusty Rose) */
+            background-color: #f7e6e8; 
+            color: #333; /* Warna teks gelap */
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        #wallpaper-container {
+            width: 100%;
+            /* Atur tinggi & lebar untuk simulasi layar ponsel */
+            max-width: 400px; 
+            height: 100%;
+            padding: 40px 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .info-text {
+            font-size: 16px;
+            font-weight: 400;
+            opacity: 0.7;
+            margin-bottom: 5px;
+        }
+
+        .verse-area {
+            flex-grow: 1; 
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* Memastikan ayat di tengah vertikal */
+        }
+
+        .verse-text {
+            /* Font Alkitabiah Elegann */
+            font-family: 'Playfair Display', serif; 
+            font-size: 32px; 
+            font-weight: 700;
+            line-height: 1.5; /* Jarak antar baris yang nyaman */
+            margin: 20px 0;
+            white-space: pre-wrap; /* Memastikan baris baru (\n) berfungsi */
+        }
+
+        #verse-reference {
+            font-size: 18px;
+            margin-top: 15px;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="wallpaper-container">
+        <p id="date-today" class="info-text"></p>
+        <div class="verse-area">
+            <p id="verse-text" class="verse-text">Memuat ayat...</p>
+            <p id="verse-reference" class="info-text"></p>
+        </div>
+    </div>
+
+    <script>
+        // Data Ayat Harian (Ganti dengan 365 ayat penuh Anda)
+        // Catatan: Gunakan "\n" untuk membuat baris baru dalam ayat!
+        const dailyVerses = [
+            // [0] Hari ke-316 (11 November 2025)
+            {
+                "text": "Tetapi orang yang sabar melebihi seorang pahlawan,\ndan orang yang menguasai dirinya,\nmelebihi orang yang merebut kota.",
+                "reference": "Amsal 16:32"
+            },
+            // [1] 12 November
+            {
+                "text": "Janganlah hendaknya kerajinanmu kendor,\nbiarlah rohmu menyala-nyala\ndan layanilah Tuhan.",
+                "reference": "Roma 12:11"
+            },
+            // [2] 13 November
+            {
+                "text": "Tetapi carilah dahulu Kerajaan Allah dan kebenarannya,\nmaka semuanya itu akan ditambahkan kepadamu.",
+                "reference": "Matius 6:33"
+            },
+            // ... Lanjutkan daftar Anda hingga 365 ayat ...
+            // Anda dapat mengisinya dengan array yang berisi 365 objek {text, reference}
+        ];
+
+        $(document).ready(function() {
+            // Fungsi untuk menghitung indeks hari keberapa dalam setahun (0-364)
+            function getDayIndex() {
+                const now = new Date();
+                const start = new Date(now.getFullYear(), 0, 0); // 1 Januari tahun ini
+                const diff = now - start;
+                const oneDay = 1000 * 60 * 60 * 24;
+                // Indeks dimulai dari 0 (untuk array JS), jadi kurangi 1
+                return Math.floor(diff / oneDay) - 1; 
+            }
+
+            const dayIndex = getDayIndex();
+            
+            // Mengambil tanggal hari ini dalam format bahasa Indonesia
+            const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            $("#date-today").text(new Date().toLocaleDateString('id-ID', dateOptions));
+
+            // Cek apakah data tersedia untuk hari ini
+            if (dayIndex >= 0 && dayIndex < dailyVerses.length) {
+                const dailyVerse = dailyVerses[dayIndex];
+                
+                // Menampilkan teks ayat dan referensi
+                $("#verse-text").text(dailyVerse.text);
+                $("#verse-reference").text("~ " + dailyVerse.reference + " ~");
+
+            } else {
+                $("#verse-text").text("Error: Data ayat untuk hari ini tidak ditemukan. Indeks saat ini: " + dayIndex);
+                $("#verse-reference").text("Pastikan array dailyVerses berisi 365 ayat.");
+            }
+        });
+    </script>
+
+</body>
+</html>
