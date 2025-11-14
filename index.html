@@ -15,7 +15,7 @@
         width: 100vw;
         height: 100vh;
         font-family: 'Segoe UI', sans-serif;
-        color: white;
+        color: white!important;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -48,6 +48,7 @@
     #container {
         width: 70%;
         max-width: 900px;
+		text-align: center;
     }
 
     #ref {
@@ -80,7 +81,31 @@
 	}
 	.hidden {
     display: none !important;
-}
+    }
+	.btn-1 {
+        position: absolute;
+        width: 150px;
+        bottom: 20px;
+        right: 380px;
+        padding: 10px 18px;
+        border: none;
+        border-radius: 6px;
+        background: rgba(255,255,255,0.7);
+        cursor: pointer;
+        font-size: 14px;
+    }
+	.btn-2 {
+        position: absolute;
+        width: 150px;
+        bottom: 20px;
+        right: 190px;
+        padding: 10px 18px;
+        border: none;
+        border-radius: 6px;
+        background: rgba(255,255,255,0.7);
+        cursor: pointer;
+        font-size: 14px;
+    }
 </style>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -97,8 +122,8 @@
 
 <button id="exportCsvBtn" class="btn">Export CSV</button>
 <button id="saveImageBtn" class="btn">Save Wallpaper</button>
-<button id="btnExport"  class="btn">Export CSV</button>
-<button id="btnShowAddModal" class="btn btn-info">Tambah Ayat</button>
+<button id="btnExport"  class="btn btn-1">Export CSV</button>
+<button id="btnShowAddModal" class="btn btn-2">Tambah Ayat</button>
 
 <div class="modal fade" id="addVerseModal" tabindex="-1">
   <div class="modal-dialog modal-lg">
@@ -149,7 +174,8 @@
 </div>
 
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script> 
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="script.js"></script>
 </body>
 <script>
 // ===============================
