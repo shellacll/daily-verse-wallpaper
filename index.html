@@ -1,136 +1,375 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ayat Harian Wallpaper Otomatis</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Montserrat:wght@400&display=swap" rel="stylesheet">
-    
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<meta charset="UTF-8">
+<title>Wallpaper Ayat Harian</title>
+<style>
+	@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&display=swap');
 
-    <style>
-        /* CSS untuk Desain Wallpaper */
-        body {
-            margin: 0;
-            padding: 0;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            /* Latar Belakang Pastel Lembut (Pale Lavender/Dusty Rose) */
-            background-color: #f7e6e8; 
-            color: #333; /* Warna teks gelap */
-            font-family: 'Montserrat', sans-serif;
-        }
+	body {
+		font-family: 'Cormorant Garamond', serif;
+	}
+    body {
+        margin: 0;
+        padding: 0;
+        width: 100vw;
+        height: 100vh;
+        font-family: 'Segoe UI', sans-serif;
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
 
-        #wallpaper-container {
-            width: 100%;
-            /* Atur tinggi & lebar untuk simulasi layar ponsel */
-            max-width: 400px; 
-            height: 100%;
-            padding: 40px 20px;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            text-align: center;
-        }
+    #bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-size: cover;
+        background-position: center;
+        z-index: -2;
+    }
 
-        .info-text {
-            font-size: 16px;
-            font-weight: 400;
-            opacity: 0.7;
-            margin-bottom: 5px;
-        }
+    #overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.45); /* transparency */
+        z-index: -1;
+    }
 
-        .verse-area {
-            flex-grow: 1; 
-            display: flex;
-            flex-direction: column;
-            justify-content: center; /* Memastikan ayat di tengah vertikal */
-        }
+    #container {
+        width: 70%;
+        max-width: 900px;
+    }
 
-        .verse-text {
-            /* Font Alkitabiah Elegann */
-            font-family: 'Playfair Display', serif; 
-            font-size: 32px; 
-            font-weight: 700;
-            line-height: 1.5; /* Jarak antar baris yang nyaman */
-            margin: 20px 0;
-            white-space: pre-wrap; /* Memastikan baris baru (\n) berfungsi */
-        }
+    #ref {
+        font-size: 32px;
+        margin-bottom: 15px;
+        font-weight: bold;
+        text-shadow: 0 0 10px black;
+    }
 
-        #verse-reference {
-            font-size: 18px;
-            margin-top: 15px;
-            opacity: 0.9;
-        }
-    </style>
+    #text {
+        font-size: 24px;
+        line-height: 1.45;
+        text-shadow: 0 0 10px black;
+    }
+
+    #exportCsvBtn {
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        padding: 10px 18px;
+        border: none;
+        border-radius: 6px;
+        background: rgba(255,255,255,0.7);
+        cursor: pointer;
+        font-size: 14px;
+    }
+	
+	#saveImageBtn {
+	position:absolute; bottom:20px; left:20px; padding:10px 18px; background:rgba(255,255,255,0.7); border:none; border-radius:6px; cursor:pointer;
+	}
+	.hidden {
+    display: none !important;
+}
+</style>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
 </head>
 <body>
 
-    <div id="wallpaper-container">
-        <p id="date-today" class="info-text"></p>
-        <div class="verse-area">
-            <p id="verse-text" class="verse-text">Memuat ayat...</p>
-            <p id="verse-reference" class="info-text"></p>
+<div id="bg"></div>
+<div id="overlay"></div>
+
+<div id="container">
+    <div id="ref">Loading...</div>
+    <div id="text"></div>
+</div>
+
+<button id="exportCsvBtn" class="btn">Export CSV</button>
+<button id="saveImageBtn" class="btn">Save Wallpaper</button>
+<button id="btnExport"  class="btn">Export CSV</button>
+<button id="btnShowAddModal" class="btn btn-info">Tambah Ayat</button>
+
+<div class="modal fade" id="addVerseModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <h5 class="modal-title">Tambah Ayat ke LocalStorage</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+
+        <div class="mb-3">
+            <label class="form-label">Reference (contoh: Mazmur 23:1)</label>
+            <input type="text" id="mRef" class="form-control">
         </div>
+
+        <div class="mb-3">
+            <label class="form-label">Ayat</label>
+            <textarea id="mVerse" class="form-control" rows="3"></textarea>
+        </div>
+
+        <div class="row">
+            <div class="col">
+                <label class="form-label">Versi</label>
+                <input type="text" id="mVersion" class="form-control" placeholder="TB / BIMK / dll">
+            </div>
+            <div class="col">
+                <label class="form-label">Kategori</label>
+                <input type="text" id="mCategory" class="form-control">
+            </div>
+        </div>
+
+        <div class="mt-3">
+            <label class="form-label">Catatan</label>
+            <input type="text" id="mNotes" class="form-control">
+        </div>
+
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+        <button id="btnSaveVerse" type="button" class="btn btn-primary">Simpan Ayat</button>
+      </div>
+
     </div>
+  </div>
+</div>
 
-    <script>
-        // Data Ayat Harian (Ganti dengan 365 ayat penuh Anda)
-        // Catatan: Gunakan "\n" untuk membuat baris baru dalam ayat!
-        const dailyVerses = [
-            // [0] Hari ke-316 (11 November 2025)
-            {
-                "text": "Tetapi orang yang sabar melebihi seorang pahlawan,\ndan orang yang menguasai dirinya,\nmelebihi orang yang merebut kota.",
-                "reference": "Amsal 16:32"
-            },
-            // [1] 12 November
-            {
-                "text": "Janganlah hendaknya kerajinanmu kendor,\nbiarlah rohmu menyala-nyala\ndan layanilah Tuhan.",
-                "reference": "Roma 12:11"
-            },
-            // [2] 13 November
-            {
-                "text": "Tetapi carilah dahulu Kerajaan Allah dan kebenarannya,\nmaka semuanya itu akan ditambahkan kepadamu.",
-                "reference": "Matius 6:33"
-            },
-            // ... Lanjutkan daftar Anda hingga 365 ayat ...
-            // Anda dapat mengisinya dengan array yang berisi 365 objek {text, reference}
-        ];
-
-        $(document).ready(function() {
-            // Fungsi untuk menghitung indeks hari keberapa dalam setahun (0-364)
-            function getDayIndex() {
-                const now = new Date();
-                const start = new Date(now.getFullYear(), 0, 0); // 1 Januari tahun ini
-                const diff = now - start;
-                const oneDay = 1000 * 60 * 60 * 24;
-                // Indeks dimulai dari 0 (untuk array JS), jadi kurangi 1
-                return Math.floor(diff / oneDay) - 1; 
-            }
-
-            const dayIndex = getDayIndex();
-            
-            // Mengambil tanggal hari ini dalam format bahasa Indonesia
-            const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            $("#date-today").text(new Date().toLocaleDateString('id-ID', dateOptions));
-
-            // Cek apakah data tersedia untuk hari ini
-            if (dayIndex >= 0 && dayIndex < dailyVerses.length) {
-                const dailyVerse = dailyVerses[dayIndex];
-                
-                // Menampilkan teks ayat dan referensi
-                $("#verse-text").text(dailyVerse.text);
-                $("#verse-reference").text("~ " + dailyVerse.reference + " ~");
-
-            } else {
-                $("#verse-text").text("Error: Data ayat untuk hari ini tidak ditemukan. Indeks saat ini: " + dayIndex);
-                $("#verse-reference").text("Pastikan array dailyVerses berisi 365 ayat.");
-            }
-        });
-    </script>
-
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script> 
 </body>
+<script>
+// ===============================
+// RANDOM FREE BACKGROUND IMAGES
+// =============================== 
+const backgrounds = [
+  "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
+  "https://images.unsplash.com/photo-1499084732479-de2c02d45fc4",
+  "https://images.unsplash.com/photo-1501785888041-af3ef285b470",
+  "https://images.unsplash.com/photo-1500534623283-312aade485b7",
+  "https://images.unsplash.com/photo-1496307042754-b4aa456c4a2d",
+  "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429",
+  "https://images.unsplash.com/photo-1499346030926-9a72daac6c63",
+  "https://images.unsplash.com/photo-1491553895911-0055eca6402d",
+  "https://images.unsplash.com/photo-1470770841072-f978cf4d019e",
+  "https://images.unsplash.com/photo-1472214103451-9374bd1c798e",
+  "https://images.unsplash.com/photo-1441974231531-c6227db76b6e",
+  "https://images.unsplash.com/photo-1469474968028-56623f02e42e",
+  "https://images.unsplash.com/photo-1502082553048-f009c37129b9",
+  "https://images.unsplash.com/photo-1499088513455-78ed2a3f7f86",
+  "https://images.unsplash.com/photo-1470770841072-f978cf4d019e",
+  "https://images.unsplash.com/photo-1500534623283-312aade485b7",
+  "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429",
+  "https://images.unsplash.com/photo-1482192596544-9eb780fc7f66",
+  "https://images.unsplash.com/photo-1500534314211-b98d27c0e47c",
+  "https://images.unsplash.com/photo-1502082553048-f009c37129b9",
+  "https://images.unsplash.com/photo-1503264116251-35a269479413",
+  "https://images.unsplash.com/photo-1502082553048-f009c37129b9",
+  "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+  "https://images.unsplash.com/photo-1469474968028-56623f02e42e",
+  "https://images.unsplash.com/photo-1500375592092-40eb2168fd21",
+  "https://images.unsplash.com/photo-1439396087961-98bc12c21176",
+  "https://images.unsplash.com/photo-1470770841072-f978cf4d019e",
+  "https://images.unsplash.com/photo-1519681393784-d120267933ba",
+  "https://images.unsplash.com/photo-1521295121783-8a321d551ad2",
+  "https://images.unsplash.com/photo-1500534623283-312aade485b7",
+  "https://images.unsplash.com/photo-1496307042754-b4aa456c4a2d",
+  "https://images.unsplash.com/photo-1500534314209-a25ddb2bd429",
+  "https://images.unsplash.com/photo-1482192596544-9eb780fc7f66",
+  "https://images.unsplash.com/photo-1500534314211-b98d27c0e47c",
+  "https://images.unsplash.com/photo-1503264116251-35a269479413",
+  "https://images.unsplash.com/photo-1502082553048-f009c37129b9",
+  "https://images.unsplash.com/photo-1506744038136-46273834b3fb",
+  "https://images.unsplash.com/photo-1469474968028-56623f02e42e",
+  "https://images.unsplash.com/photo-1500375592092-40eb2168fd21",
+  "https://images.unsplash.com/photo-1439396087961-98bc12c21176",
+  "https://images.unsplash.com/photo-1519681393784-d120267933ba",
+  "https://images.unsplash.com/photo-1521295121783-8a321d551ad2",
+  "https://images.unsplash.com/photo-1441974231531-c6227db76b6e",
+  "https://images.unsplash.com/photo-1484950763426-56b5bf172dbb",
+  "https://images.unsplash.com/photo-1532274402911-5a369e4c4bb5",
+  "https://images.unsplash.com/photo-1536305030015-0c2a5e0c0642",
+  "https://images.unsplash.com/photo-1505483531331-fc3cf89fd382",
+  "https://images.unsplash.com/photo-1518837695005-2083093ee35b",
+  "https://images.unsplash.com/photo-1500534623283-312aade485b7"
+];
+
+document.getElementById("bg").style.backgroundImage =
+    `url('${backgrounds[Math.floor(Math.random() * backgrounds.length)]}?w=1920')`;
+
+
+// ===============================
+// SAMPLE 5 AYAT FALLBACK LOCAL
+// ===============================
+const fallbackVerses = [
+    { ref: "Mazmur 23:1", text: "Tuhan adalah gembalaku, takkan kekurangan aku." },
+    { ref: "Yesaya 41:10", text: "Jangan takut, sebab Aku menyertai engkau." },
+    { ref: "Filipi 4:13", text: "Segala perkara dapat kutanggung di dalam Dia." },
+    { ref: "Yeremia 29:11", text: "Aku ini mengetahui rancangan-rancangan apa yang ada pada-Ku mengenai kamu." },
+    { ref: "Amsal 3:5", text: "Percayalah kepada Tuhan dengan segenap hatimu." }
+];
+
+
+// ===============================
+// SIMPAN AYAT KE LOCALSTORAGE
+// ===============================
+function saveVerse(date, ref, text, source) {
+    const item = { date, ref, text, source };
+
+    let history = JSON.parse(localStorage.getItem("verseHistory") || "[]");
+
+    const idx = history.findIndex(x => x.date === date);
+    if (idx >= 0) history[idx] = item;
+    else history.push(item);
+
+    localStorage.setItem("verseHistory", JSON.stringify(history));
+}
+
+
+// ===============================
+// EXPORT KE CSV
+// ===============================
+function exportCSV() {
+    let data = JSON.parse(localStorage.getItem("verseHistory") || "[]");
+    if (data.length === 0) {
+        alert("Belum ada data untuk di-export.");
+        return;
+    }
+
+    let csv = "Date,Reference,Verse,Source\n";
+
+    data.forEach(v => {
+        const ref = `"${v.ref.replace(/"/g, '""')}"`;
+        const txt = `"${v.text.replace(/"/g, '""')}"`;
+        csv += `${v.date},${ref},${txt},${v.source}\n`;
+    });
+
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "bible-history.csv";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+}
+
+document.getElementById("exportCsvBtn").onclick = exportCSV;
+
+
+// ===============================
+// FETCH GOOGLE SHEETS CSV
+// ===============================
+async function loadVerse() {
+    const today = new Date().toISOString().slice(0, 10);
+
+    const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQaZfY0xwUB-0cwUAlmyPUJntAyvqiAFCBMQsU_ihJDtjPUrEG7LuAVSa-k_Qdt9V0HKa3Fa8XTNPrA/pub?gid=0&single=true&output=csv";
+
+    try {
+        const response = await fetch(url, { method: "GET" });
+
+        if (!response.ok) throw new Error("Failed to load");
+
+        const csvText = await response.text();
+        const rows = csvText.split("\n").map(r => r.split(","));
+
+        // Format: date,ref,text
+        const row = rows.find(r => r[0] === today);
+
+        if (!row) throw new Error("Not found");
+
+        const ref = row[1];
+        const text = row.slice(2).join(","); // handle commas inside verses
+
+        displayVerse(ref, text);
+        saveVerse(today, ref, text, "google-sheet");
+
+    } catch (err) {
+        // FALLBACK KE SAMPLE 5 AYAT
+        const fallback = fallbackVerses[Math.floor(Math.random() * fallbackVerses.length)];
+
+        displayVerse(fallback.ref, fallback.text);
+        saveVerse(today, fallback.ref, fallback.text, "local-fallback");
+    }
+}
+
+
+// ===============================
+// TAMPILKAN AYAT DI WALLPAPER
+// ===============================
+function displayVerse(ref, text) {
+    document.getElementById("ref").textContent = ref;
+    document.getElementById("text").textContent = text;
+}
+
+loadVerse();
+
+function saveAsImage() {
+    const target = document.body; // screenshot seluruh layar wallpaper
+	const btn = $(".btn");
+	const filename = generateFileName("verse");
+
+	// sembunyikan button agar tidak masuk screenshot
+	btn.addClass("hidden");
+    html2canvas(target, {
+        useCORS: true,
+        allowTaint: true,
+        scale: 2,            // biar hasilnya HD
+        backgroundColor: null
+    }).then(canvas => {
+        const link = document.createElement("a");
+        link.download = filename;
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+        // tampilkan lagi setelah screenshot
+        btn.removeClass("hidden");
+    });
+}
+
+function generateFileName(prefix = "wallpaper") {
+    const now = new Date();
+
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    const dd = String(now.getDate()).padStart(2, '0');
+    const hh = String(now.getHours()).padStart(2, '0');
+    const mi = String(now.getMinutes()).padStart(2, '0');
+    const ss = String(now.getSeconds()).padStart(2, '0');
+
+    return `${prefix}_${yyyy}-${mm}-${dd}_${hh}-${mi}-${ss}.png`;
+}
+
+document.getElementById("saveImageBtn").onclick = saveAsImage;
+
+
+function addVerseFromFields(ref, verse, version, category, notes) {
+    const list = loadVerses();
+    const newObj = {
+        id: list.length + 1,
+        reference: ref,
+        verse: verse,
+        version: version,
+        category: category,
+        notes: notes
+    };
+
+    list.push(newObj);
+    saveVerses(list);
+}
+
+</script>
 </html>
