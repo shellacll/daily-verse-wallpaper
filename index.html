@@ -9,6 +9,10 @@
 	body {
 		font-family: 'Cormorant Garamond', serif;
 	}
+	.bg-black {
+        --bs-bg-opacity: 1;
+        background-color: rgb(0 0 0 / 63%) !important;
+	}
     body {
         margin: 0;
         padding: 0;
@@ -64,48 +68,13 @@
         text-shadow: 0 0 10px black;
     }
 
-    #exportCsvBtn {
-        position: absolute;
-        bottom: 20px;
-        right: 20px;
-        padding: 10px 18px;
-        border: none;
-        border-radius: 6px;
-        background: rgba(255,255,255,0.7);
-        cursor: pointer;
-        font-size: 14px;
+    .btn-light {
+        position:relative; bottom:20px; padding:10px 18px; background:#f8f9fa75!important; border:none; border-radius:6px; cursor:pointer;
     }
-	
-	#saveImageBtn {
-	position:absolute; bottom:20px; left:20px; padding:10px 18px; background:rgba(255,255,255,0.7); border:none; border-radius:6px; cursor:pointer;
-	}
+	 
 	.hidden {
     display: none !important;
-    }
-	.btn-1 {
-        position: absolute;
-        width: 150px;
-        bottom: 20px;
-        right: 380px;
-        padding: 10px 18px;
-        border: none;
-        border-radius: 6px;
-        background: rgba(255,255,255,0.7);
-        cursor: pointer;
-        font-size: 14px;
-    }
-	.btn-2 {
-        position: absolute;
-        width: 150px;
-        bottom: 20px;
-        right: 190px;
-        padding: 10px 18px;
-        border: none;
-        border-radius: 6px;
-        background: rgba(255,255,255,0.7);
-        cursor: pointer;
-        font-size: 14px;
-    }
+    } 
 </style>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -119,15 +88,29 @@
     <div id="ref">Loading...</div>
     <div id="text"></div>
 </div>
-
-<button id="exportCsvBtn" class="btn">Export CSV</button>
-<button id="saveImageBtn" class="btn">Save Wallpaper</button>
-<button id="btnExport"  class="btn btn-1">Export CSV</button>
-<button id="btnShowAddModal" class="btn btn-2">Tambah Ayat</button>
+ 
+<div class="container-fluid position-absolute bottom-0 pb-3">
+  <div class="row g-2 justify-content-center">
+    <div class="col-sm-3">
+        <button id="btnDownload" class="btn btn-light w-100">Save Wallpaper</button>
+    </div>
+    <div class="col-sm-3">
+        <button id="btnExport" class="btn btn-light w-100">Export CSV</button>
+    </div> 
+    <div class="col-sm-3">
+        <button id="btnList" class="btn btn-light w-100" data-bs-toggle="modal" data-bs-target="#listVerseModal" onclick="renderVerseList()">List Ayat</button>
+    </div>
+    <div class="col-sm-3">
+        <button id="btnList" class="btn btn-light w-100" data-bs-toggle="modal" data-bs-target="#bgModal" onclick="renderBackgroundList()">Backgrounds</button>
+    </div>
+ 
+  </div>
+</div>
+ 
 
 <div class="modal fade" id="addVerseModal" tabindex="-1">
   <div class="modal-dialog modal-lg">
-    <div class="modal-content">
+    <div class="modal-content bg-black " >
 
       <div class="modal-header">
         <h5 class="modal-title">Tambah Ayat ke LocalStorage</h5>
@@ -173,15 +156,92 @@
   </div>
 </div>
 
+<!-- Modal: List Verses -->
+<div class="modal fade" id="listVerseModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content bg-black">
+
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">Daftar Ayat Tersimpan</h5>
+        <button class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <table class="table table-striped table-bordered table-hover" id="tableVerses">
+            <thead class="table-dark">
+                <tr>
+                <th style="width: 5%">No</th>
+                <th style="width: 15%">Reference</th>
+                <th style="width: 35%">Ayat</th>
+                <th style="width: 10%">Versi</th>
+                <th style="width: 15%">Kategori</th>
+                <th style="width: 15%">Catatan</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        
+        <button class="btn btn-success"data-bs-toggle="modal" data-bs-target="#addVerseModal"  id="btnShowAddModal">Add Verse</button>
+        <button class="btn btn-warning" data-bs-dismiss="modal" onclick="clearLocalStorage()">Clear LocalStorage</button>
+        <button class="btn btn-primary" data-bs-dismiss="modal" onclick="importFallbackIfEmpty()">Import LocalStorage</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+
+<div class="modal fade" id="bgModal" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content bg-black">
+
+      <div class="modal-header">
+        <h5 class="modal-title">Daftar Background Wallpaper</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <table class="table table-bordered table-hover" id="tableBackgrounds">
+          <thead class="table-dark">
+            <tr>
+              <th width="10%">ID</th>
+              <th width="40%">Preview</th>
+              <th width="20%">Status</th>
+              <th width="20%">Aksi</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+
 <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+
+
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<!-- Bootstrap 5 JS + Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script> 
 <script src="script.js"></script>
 </body>
 <script>
 // ===============================
 // RANDOM FREE BACKGROUND IMAGES
 // =============================== 
-const backgrounds = [
+const BG_KEY = "backgroundList";
+const dummyBackgrounds = [
   "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee",
   "https://images.unsplash.com/photo-1499084732479-de2c02d45fc4",
   "https://images.unsplash.com/photo-1501785888041-af3ef285b470",
@@ -233,19 +293,300 @@ const backgrounds = [
   "https://images.unsplash.com/photo-1500534623283-312aade485b7"
 ];
 
-document.getElementById("bg").style.backgroundImage =
-    `url('${backgrounds[Math.floor(Math.random() * backgrounds.length)]}?w=1920')`;
+let bgCache = null;
 
 
+function preloadBackground() {
+    const list = loadBGList(); 
+    if (list.length === 0) return;
+
+    const random = list[Math.floor(Math.random() * list.length)];
+    const url = `${random.url}?w=1200&auto=format&fit=crop&q=60`;
+
+    const img = new Image();
+    img.src = url;
+    img.onload = () => {
+        bgCache = url;
+        console.log("Background preloaded");
+    };
+}
+
+$("#bgModal").on("show.bs.modal", function () {
+    if (bgCache) {
+        $("#previewBG").css("background-image", `url('${bgCache}')`);
+    }
+});
+function loadBGList() {
+    return JSON.parse(localStorage.getItem(BG_KEY) || "[]");
+}
+function saveBGList(list) {
+    localStorage.setItem(BG_KEY, JSON.stringify(list));
+}
+
+async function removeBrokenBackgrounds() {
+    let list = loadBGList(); // ambil dari localStorage
+    let validList = [];
+
+    const checkImage = (url) => {
+        return new Promise(resolve => {
+            const img = new Image();
+            img.onload = () => resolve(true);  // valid
+            img.onerror = () => resolve(false); // 404 / broken
+            img.src = url;
+        });
+    };
+
+    for (const item of list) {
+        const ok = await checkImage(item.url);
+
+        if (ok) {
+            validList.push(item);
+        } else {
+            console.warn("REMOVED BROKEN IMAGE:", item.url);
+        }
+    }
+
+    saveBGList(validList);
+
+    console.log(
+        `Background cleanup done. Valid: ${validList.length}, Removed: ${
+            list.length - validList.length
+        }`
+    );
+}
+
+
+function importDummyBackgroundsIfEmpty() {
+    const existing = loadBGList();
+
+    // kalau sudah ada data, tidak perlu import dummy
+    if (existing.length > 0) {
+        console.log("Background list already exists, skipping dummy import.");
+        return;
+    }
+
+    // clean + unique
+    const unique = new Set();
+
+    const cleaned = dummyBackgrounds
+        .map(url => url.trim().split("?")[0]) // hapus query parameters
+        .filter(url => {
+            if (unique.has(url)) return false;
+            unique.add(url);
+            return true;
+        });
+
+    // Simpan ke localStorage
+    const converted = cleaned.map(url => ({
+        id: Date.now() + Math.random(),
+        url,
+        addedAt: new Date().toISOString()
+    }));
+
+    saveBGList(converted);
+}
+
+async function renderBackgroundList() {
+    const list = JSON.parse(localStorage.getItem(BG_KEY)) || [];
+    const tbody = $("#tableBackgrounds tbody");
+    tbody.empty();
+
+    if (list.length === 0) {
+        tbody.append(`
+            <tr>
+                <td colspan="4" class="text-center text-muted">Belum ada background.</td>
+            </tr>
+        `);
+        return;
+    }
+
+    for (const item of list) {
+        const isValid = await checkImage(item.url);
+
+        tbody.append(`
+            <tr>
+                <td>${item.id}</td>
+                <td>
+                    <img src="${item.url}" 
+                         style="width:80px;height:50px;object-fit:cover;border-radius:6px;border:1px solid #ccc;">
+                </td>
+                <td>
+                    ${isValid ? 
+                        '<span class="badge bg-success">OK</span>' : 
+                        '<span class="badge bg-danger">BROKEN</span>'}
+                </td>
+                <td>
+                    <button class="btn btn-sm btn-danger" onclick="deleteBackground(${item.id})">
+                        Hapus
+                    </button>
+                </td>
+            </tr>
+        `);
+    }
+}
+function checkImage(url) {
+    return new Promise(resolve => {
+        const img = new Image();
+        img.onload = () => resolve(true);
+        img.onerror = () => resolve(false);
+        img.src = url + "?w=400&q=40&cache=" + Math.random();
+    });
+}
+
+function deleteBackground(id) {
+    let list = JSON.parse(localStorage.getItem(BG_KEY)) || [];
+
+    list = list.filter(item => item.id !== id);
+
+    localStorage.setItem(BG_KEY, JSON.stringify(list));
+
+    renderBackgroundList();
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    importDummyBackgroundsIfEmpty();
+    removeBrokenBackgrounds();
+    setRandomBackground();
+});
+
+
+function setRandomBackground() {
+    const list = JSON.parse(localStorage.getItem(BG_KEY)) || [];
+
+    if (list.length === 0) {
+        console.warn("Background list kosong!");
+        return;
+    }
+
+    const random = list[Math.floor(Math.random() * list.length)];
+
+    $("#bg").css("background-image", `url('${random.url}?w=1920')`);
+}
+const STORAGE_KEY = "verseHistory";
 // ===============================
 // SAMPLE 5 AYAT FALLBACK LOCAL
 // ===============================
 const fallbackVerses = [
-    { ref: "Mazmur 23:1", text: "Tuhan adalah gembalaku, takkan kekurangan aku." },
-    { ref: "Yesaya 41:10", text: "Jangan takut, sebab Aku menyertai engkau." },
-    { ref: "Filipi 4:13", text: "Segala perkara dapat kutanggung di dalam Dia." },
-    { ref: "Yeremia 29:11", text: "Aku ini mengetahui rancangan-rancangan apa yang ada pada-Ku mengenai kamu." },
-    { ref: "Amsal 3:5", text: "Percayalah kepada Tuhan dengan segenap hatimu." }
+    {
+        id: 1,
+        reference: "Mazmur 23:1",
+        verse: "TUHAN adalah gembalaku, takkan kekurangan aku.",
+        version: "TB",
+        category: "penguatan",
+        notes: ""
+    },
+    {
+        id: 2,
+        reference: "Yesaya 41:10",
+        verse: "Janganlah takut, sebab Aku menyertai engkau; janganlah bimbang, sebab Aku ini Allahmu.",
+        version: "TB",
+        category: "penguatan",
+        notes: ""
+    },
+    {
+        id: 3,
+        reference: "Yeremia 29:11",
+        verse: "Sebab Aku ini mengetahui rancangan-rancangan apa yang ada pada-Ku mengenai kamu...",
+        version: "TB",
+        category: "pengharapan",
+        notes: ""
+    },
+    {
+        id: 4,
+        reference: "Filipi 4:13",
+        verse: "Segala perkara dapat kutanggung di dalam Dia yang memberi kekuatan kepadaku.",
+        version: "TB",
+        category: "penguatan",
+        notes: ""
+    },
+    {
+        id: 5,
+        reference: "Roma 8:28",
+        verse: "Allah turut bekerja dalam segala sesuatu untuk mendatangkan kebaikan bagi mereka yang mengasihi Dia.",
+        version: "TB",
+        category: "pengharapan",
+        notes: ""
+    },
+    {
+        id: 6,
+        reference: "Mazmur 91:1",
+        verse: "Orang yang duduk dalam lindungan Yang Mahatinggi dan bermalam dalam naungan Yang Mahakuasa...",
+        version: "TB",
+        category: "penghiburan",
+        notes: ""
+    },
+    {
+        id: 7,
+        reference: "Amsal 3:5–6",
+        verse: "Percayalah kepada TUHAN dengan segenap hatimu, dan janganlah bersandar kepada pengertianmu sendiri.",
+        version: "TB",
+        category: "hikmat",
+        notes: ""
+    },
+    {
+        id: 8,
+        reference: "Mazmur 46:1",
+        verse: "Allah itu bagi kita tempat perlindungan dan kekuatan, sebagai penolong dalam kesesakan sangat terbukti.",
+        version: "TB",
+        category: "penghiburan",
+        notes: ""
+    },
+    {
+        id: 9,
+        reference: "Matius 11:28",
+        verse: "Marilah kepada-Ku, semua yang letih lesu dan berbeban berat, Aku akan memberi kelegaan kepadamu.",
+        version: "TB",
+        category: "penghiburan",
+        notes: ""
+    },
+    {
+        id: 10,
+        reference: "Mazmur 121:1–2",
+        verse: "Aku melayangkan mataku ke gunung-gunung; dari manakah akan datang pertolonganku?",
+        version: "TB",
+        category: "pengharapan",
+        notes: ""
+    },
+    {
+        id: 11,
+        reference: "1 Korintus 13:4",
+        verse: "Kasih itu sabar; kasih itu murah hati; ia tidak cemburu.",
+        version: "TB",
+        category: "kasih",
+        notes: ""
+    },
+    {
+        id: 12,
+        reference: "Mazmur 34:18",
+        verse: "TUHAN itu dekat kepada orang yang patah hati, dan Ia menyelamatkan orang-orang yang remuk jiwanya.",
+        version: "TB",
+        category: "penghiburan",
+        notes: ""
+    },
+    {
+        id: 13,
+        reference: "Yesaya 40:31",
+        verse: "Tetapi orang-orang yang menanti-nantikan TUHAN mendapat kekuatan baru...",
+        version: "TB",
+        category: "pengharapan",
+        notes: ""
+    },
+    {
+        id: 14,
+        reference: "Yohanes 14:27",
+        verse: "Damai sejahtera Kutinggalkan bagimu. Damai sejahtera-Ku Kuberikan kepadamu...",
+        version: "TB",
+        category: "damai",
+        notes: ""
+    },
+    {
+        id: 15,
+        reference: "Mazmur 37:5",
+        verse: "Serahkanlah hidupmu kepada TUHAN dan percayalah kepada-Nya, dan Ia akan bertindak.",
+        version: "TB",
+        category: "iman",
+        notes: ""
+    }
 ];
 
 
@@ -255,13 +596,13 @@ const fallbackVerses = [
 function saveVerse(date, ref, text, source) {
     const item = { date, ref, text, source };
 
-    let history = JSON.parse(localStorage.getItem("verseHistory") || "[]");
+    let history = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
 
     const idx = history.findIndex(x => x.date === date);
     if (idx >= 0) history[idx] = item;
     else history.push(item);
 
-    localStorage.setItem("verseHistory", JSON.stringify(history));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
 }
 
 
@@ -269,32 +610,46 @@ function saveVerse(date, ref, text, source) {
 // EXPORT KE CSV
 // ===============================
 function exportCSV() {
-    let data = JSON.parse(localStorage.getItem("verseHistory") || "[]");
-    if (data.length === 0) {
-        alert("Belum ada data untuk di-export.");
+    let list = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+
+    if (list.length === 0) {
+        alert("Data kosong, tidak ada yang dapat diexport.");
         return;
     }
 
-    let csv = "Date,Reference,Verse,Source\n";
+    // Header CSV
+    const headers = ["id", "reference", "verse", "version", "category", "notes"];
 
-    data.forEach(v => {
-        const ref = `"${v.ref.replace(/"/g, '""')}"`;
-        const txt = `"${v.text.replace(/"/g, '""')}"`;
-        csv += `${v.date},${ref},${txt},${v.source}\n`;
+    // Convert ke CSV format
+    const rows = list.map(item => {
+        return [
+            item.id,
+            `"${(item.reference || "").replace(/"/g, '""')}"`,
+            `"${(item.verse || "").replace(/"/g, '""')}"`,
+            `"${(item.version || "").replace(/"/g, '""')}"`,
+            `"${(item.category || "").replace(/"/g, '""')}"`,
+            `"${(item.notes || "").replace(/"/g, '""')}"`
+        ].join(",");
     });
 
-    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const csvContent = [headers.join(","), ...rows].join("\n");
+
+    // Buat file downloadable
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
 
     const a = document.createElement("a");
     a.href = url;
-    a.download = "bible-history.csv";
+    a.download = "verses_export.csv";
     document.body.appendChild(a);
     a.click();
+
     document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 }
 
-document.getElementById("exportCsvBtn").onclick = exportCSV;
+
+document.getElementById("btnExport").onclick = exportCSV;
 
 
 // ===============================
@@ -302,44 +657,121 @@ document.getElementById("exportCsvBtn").onclick = exportCSV;
 // ===============================
 async function loadVerse() {
     const today = new Date().toISOString().slice(0, 10);
-
     const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQaZfY0xwUB-0cwUAlmyPUJntAyvqiAFCBMQsU_ihJDtjPUrEG7LuAVSa-k_Qdt9V0HKa3Fa8XTNPrA/pub?gid=0&single=true&output=csv";
 
+    console.log("🔍 Mencoba load dari Google Sheet...");
+
+    // 1️⃣ --- Coba load dari CSV Google Sheet ---
     try {
-        const response = await fetch(url, { method: "GET" });
+        const response = await fetch(url, { cache: "no-store" });
+        if (!response.ok) throw new Error("Fetch CSV failed");
 
-        if (!response.ok) throw new Error("Failed to load");
+        const text = await response.text();
+        const rows = text.split("\n").map(parseCSVLine);
 
-        const csvText = await response.text();
-        const rows = csvText.split("\n").map(r => r.split(","));
-
-        // Format: date,ref,text
         const row = rows.find(r => r[0] === today);
+        if (!row) throw new Error("Row untuk tanggal hari ini tidak ditemukan");
 
-        if (!row) throw new Error("Not found");
+        const reference = row[1]?.trim();
+        const verse = row.slice(2).join(",").trim();
 
-        const ref = row[1];
-        const text = row.slice(2).join(","); // handle commas inside verses
+        // Cek undefined
+        if (!reference || !verse)
+            throw new Error("Data CSV tidak lengkap (undefined field)");
 
-        displayVerse(ref, text);
-        saveVerse(today, ref, text, "google-sheet");
-
-    } catch (err) {
-        // FALLBACK KE SAMPLE 5 AYAT
-        const fallback = fallbackVerses[Math.floor(Math.random() * fallbackVerses.length)];
-
-        displayVerse(fallback.ref, fallback.text);
-        saveVerse(today, fallback.ref, fallback.text, "local-fallback");
+        displayVerse(reference, verse);
+        console.log("✔ Berhasil load dari Google Sheet");
+        return; // stop, tidak lanjut ke localstorage
     }
+
+    catch (csvErr) {
+        console.warn("⚠ Gagal dari CSV:", csvErr.message);
+    }
+
+    // 2️⃣ --- Coba load dari localStorage ---
+    importFallbackIfEmpty();
+
+    // 3️⃣ --- Pakai fallback random ---
+    console.log("🔍 Mencoba load dari fallback local...");
+
+    const fb = fallbackVerses[Math.floor(Math.random() * fallbackVerses.length)];
+
+    if (!fb.reference || !fb.verse) {
+        console.error("❌ Fallback undefined! Pastikan fallbackVerses benar.");
+        displayVerse("Error", "Fallback data corrupt / undefined.");
+        return;
+    }
+
+    displayVerse(fb.reference, fb.verse);
+    console.log("✔ Menggunakan fallback");
+}
+
+function parseCSVLine(line) {
+    const result = [];
+    let current = "";
+    let insideQuotes = false;
+
+    for (let i = 0; i < line.length; i++) {
+        const c = line[i];
+
+        if (c === '"' && line[i+1] === '"') {
+            current += '"'; // escaped quote ("")
+            i++;
+        } else if (c === '"') {
+            insideQuotes = !insideQuotes;
+        } else if (c === ',' && !insideQuotes) {
+            result.push(current);
+            current = "";
+        } else {
+            current += c;
+        }
+    }
+
+    result.push(current);
+    return result;
 }
 
 
 // ===============================
 // TAMPILKAN AYAT DI WALLPAPER
 // ===============================
-function displayVerse(ref, text) {
-    document.getElementById("ref").textContent = ref;
-    document.getElementById("text").textContent = text;
+function displayVerse(refOrObj, textOptional) {
+
+    let reference = "";
+    let verse = "";
+    let version = "";
+    let category = "";
+    let notes = "";
+
+    // CASE 1: Masuk dari Google Sheet → (ref, text)
+    if (typeof refOrObj === "string") {
+        reference = refOrObj;
+        verse = textOptional || "";
+        version = "TB";   // default
+    }
+
+    // CASE 2: Masuk dari fallbackVerses atau localStorage → object lengkap
+    else if (typeof refOrObj === "object") {
+        reference = refOrObj.reference;
+        verse = refOrObj.verse;
+        version = refOrObj.version ?? "TB";
+        category = refOrObj.category ?? "";
+        notes = refOrObj.notes ?? "";
+    }
+
+    // TAMPILKAN DI WALLPAPER
+    document.getElementById("ref").textContent = reference;
+    document.getElementById("text").textContent = verse;
+
+    // Tambahan OPTIONAL (kalau kamu punya elemen ini di UI)
+    const elVersion = document.getElementById("version");
+    if (elVersion) elVersion.textContent = version;
+
+    const elCategory = document.getElementById("category");
+    if (elCategory) elCategory.textContent = category;
+
+    const elNotes = document.getElementById("notes");
+    if (elNotes) elNotes.textContent = notes;
 }
 
 loadVerse();
@@ -379,7 +811,22 @@ function generateFileName(prefix = "wallpaper") {
     return `${prefix}_${yyyy}-${mm}-${dd}_${hh}-${mi}-${ss}.png`;
 }
 
-document.getElementById("saveImageBtn").onclick = saveAsImage;
+document.getElementById("btnDownload").onclick = saveAsImage;
+
+
+function loadVerses() {
+    try {
+        let stored = localStorage.getItem(STORAGE_KEY);
+        if (!stored) return fallbackVerses;
+
+        let verses = JSON.parse(stored);
+        if (Array.isArray(verses) && verses.length > 0) return verses;
+
+        return fallbackVerses;
+    } catch (e) {
+        return fallbackVerses;
+    }
+}
 
 
 function addVerseFromFields(ref, verse, version, category, notes) {
@@ -394,8 +841,172 @@ function addVerseFromFields(ref, verse, version, category, notes) {
     };
 
     list.push(newObj);
-    saveVerses(list);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
 }
+// === BOOTSTRAP MODAL ===
+const modalAdd = new bootstrap.Modal(document.getElementById("addVerseModal"));
+
+// OPEN MODAL
+$("#btnAdd").on("click", function () {
+    modalAdd.show();
+});
+
+// SAVE VERSE
+$("#btnSaveVerse").on("click", function () {
+
+    const ref     = $("#mRef").val().trim();
+    const verse   = $("#mVerse").val().trim();
+    const version = $("#mVersion").val().trim();
+    const cat     = $("#mCategory").val().trim();
+    const notes   = $("#mNotes").val().trim();
+
+    if (!ref || !verse) {
+        alert("Reference dan Ayat wajib diisi.");
+        return;
+    }
+
+    addVerseFromFields(ref, verse, version, cat, notes);
+
+    alert("Ayat berhasil ditambahkan!");
+    modalAdd.hide();
+
+    // RESET FORM
+    $("#mRef, #mVerse, #mVersion, #mCategory, #mNotes").val("");
+});
+
+function loadVersesLS() {
+    try {
+        let raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return [];
+
+        let arr = JSON.parse(raw);
+        if (!Array.isArray(arr)) return [];
+
+        return arr;
+    } catch (e) {
+        console.warn("Failed reading localStorage:", e);
+        return [];
+    }
+}
+
+
+// Render list ke tabel
+let verseTable = null;
+function renderVerseList() {
+    var list = loadVersesLS();
+
+    // Jika DataTable sudah pernah dibuat → destroy dulu
+    if (verseTable !== null) {
+        verseTable.clear().destroy();
+    }
+
+    var tbody = $("#tableVerses tbody");
+    tbody.empty();
+
+    if (!list || list.length === 0) {
+        tbody.append(`
+            <tr>
+                <td colspan="6" class="text-center text-muted">Belum ada ayat tersimpan.</td>
+            </tr>
+        `);
+    } else {
+        list.forEach((item, index) => {
+
+            // Auto-repair jika ada data undefined
+            const fixed = {
+                id: item.id ?? -1,
+                reference: item.reference ?? "[Reference MISSING]",
+                verse: item.verse ?? "[Verse MISSING]",
+                version: item.version ?? "-",
+                category: item.category ?? "-",
+                notes: item.notes ?? "-"
+            };
+
+            // Jika ada data undefined → warning di console
+            if (item.reference == null || item.verse == null) {
+                console.warn("⚠ Warning: Data ayat memiliki nilai undefined:", item);
+            }
+
+            tbody.append(`
+                <tr>
+                    <td>${index + 1}</td>
+                    <td><strong>${fixed.reference}</strong></td>
+                    <td>${fixed.verse}</td>
+                    <td>${fixed.version}</td>
+                    <td>${fixed.category}</td>
+                    <td>${fixed.notes}</td>
+                </tr>
+            `);
+        });
+    }
+
+    // Aktifkan DataTables
+    verseTable = $("#tableVerses").DataTable({
+        pageLength: 10,
+        lengthMenu: [10, 25, 50, 100],
+        responsive: true,
+        order: [[0, "asc"]], 
+        language: {
+            search: "Cari:",
+            lengthMenu: "Tampilkan _MENU_ ayat",
+            info: "Menampilkan _START_ - _END_ dari _TOTAL_ ayat",
+            paginate: {
+                first: "Awal",
+                last: "Akhir",
+                next: "→",
+                previous: "←"
+            }
+        }
+    });
+}
+
+
+function importFallbackToLocalStorage() {
+    const STORAGE_KEY = STORAGE_KEY;
+
+    // Ambil data yang sudah ada
+    let list = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+
+    // Hitung ID terakhir
+    let lastId = list.length > 0 ? list[list.length - 1].id : 0;
+
+    // Loop fallbackVerse dan masukkan ke storage
+    fallbackVerses.forEach(item => {
+        lastId++;
+
+        const newObj = {
+            id: lastId,
+            reference: item.reference,
+            verse: item.verse,
+            version: item.version ?? "TB",        // default Terjemahan Baru
+            category: item.category ?? "Umum",    // default kategori
+            notes: item.notes ?? ""               // default kosong
+        };
+
+        list.push(newObj);
+    });
+
+    // Simpan kembali ke localStorage
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+
+    console.log("Fallback verses imported:", fallbackVerses.length);
+}
+function importFallbackIfEmpty() {
+    const STORAGE_KEY = STORAGE_KEY;
+    let list = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+
+    if (list.length > 0) {
+        console.log("LocalStorage already has data. Skip import.");
+        return;
+    }
+
+    importFallbackToLocalStorage();
+}
+
+function clearLocalStorage() {
+    localStorage.removeItem(STORAGE_KEY);
+}
+
 
 </script>
 </html>
