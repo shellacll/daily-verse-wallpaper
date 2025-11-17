@@ -462,6 +462,7 @@ function setRandomBackground() {
 
     $("#bg").css("background-image", `url('${random.url}?w=1920')`);
 }
+
 const STORAGE_KEY = "verseHistory";
 // ===============================
 // SAMPLE 5 AYAT FALLBACK LOCAL
@@ -961,8 +962,7 @@ function renderVerseList() {
 }
 
 
-function importFallbackToLocalStorage() {
-    const STORAGE_KEY = STORAGE_KEY;
+function importFallbackToLocalStorage() { 
 
     // Ambil data yang sudah ada
     let list = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
@@ -991,8 +991,7 @@ function importFallbackToLocalStorage() {
 
     console.log("Fallback verses imported:", fallbackVerses.length);
 }
-function importFallbackIfEmpty() {
-    const STORAGE_KEY = STORAGE_KEY;
+function importFallbackIfEmpty() { 
     let list = JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
 
     if (list.length > 0) {
