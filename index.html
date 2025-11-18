@@ -778,6 +778,12 @@ function displayVerse(refOrObj, textOptional) {
 loadVerse();
 
 function saveAsImage() {
+	const overlay = $("#overlay");
+	overlay.css({
+	    zIndex: 9999,
+	    opacity: 0.999,          // trick
+	    transform: "translateZ(0)" // trick
+	});
     const target = document.body; // screenshot seluruh layar wallpaper
 	const btn = $(".btn");
 	const filename = generateFileName("verse");
@@ -1009,3 +1015,4 @@ function clearLocalStorage() {
 
 </script>
 </html>
+
